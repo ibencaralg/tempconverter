@@ -33,4 +33,4 @@ docker_setup_env() {
 
 docker_setup_env
 
-flask run --host=0.0.0.0 --port=5000
+gunicorn -w 4 -b 0.0.0.0:5000 app:app

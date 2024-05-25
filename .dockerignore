@@ -1,0 +1,15 @@
+# Git
+.git
+.gitattributes
+.gitignore
+README.md
+CHANGELOG.md
+# Docker
+.dockerignore
+compose.yml
+docker-compose.yml
+docker-stack.yml
+Dockerfile
+# Python
+__pycache__
+

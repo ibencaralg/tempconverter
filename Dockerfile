@@ -27,5 +27,9 @@ COPY . /app/
 # Expose Flask port
 EXPOSE 5000
 
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
 # Run the Flask app
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

@@ -1,0 +1,49 @@
+ services:
+
+   database:
+
+     image: 'mysql:8.0-debian'
+     environment:
+       - MYSQL_RANDOM_ROOT_PASSWORD=true
+       - MYSQL_DATABASE_FILE=/run/secrets/mysql_database
+       - MYSQL_USER_FILE=/run/secrets/mysql_user
+       - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+     secrets:
+       - mysql_database
+       - mysql_user
+       - mysql_password
+     healthcheck:
+       test: ["CMD", "mysqladmin", "ping", "-u$MYSQL_USER", "-p$MYSQL_PASSWORD"]
+       start_period: 10s
+       interval: 15s
+       retries: 3
+
+   web:
+
+    image: 'ibencar022/tempconverter:latest'
+    environment:
+      - DB_HOST=database
+      - DB_NAME_FILE=/run/secrets/mysql_database
+      - DB_USER_FILE=/run/secrets/mysql_user
+      - DB_PASS_FILE=/run/secrets/mysql_password
+    secrets:
+      - mysql_database
+      - mysql_user
+      - mysql_password
+    ports:
+      - '80:5000'
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:5000 || exit 1"]
+      start_period: 15s
+      interval: 2s
+      retries: 3
+    deploy:
+      replicas: 2
+
+ secrets:
+   mysql_database:
+     external: true
+   mysql_user:
+     external: true
+   mysql_password:
+     external: true

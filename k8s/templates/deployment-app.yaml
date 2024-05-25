@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tempconverter.fullname" . }}-app
+  labels:
+    {{- include "tempconverter.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.appReplicaCount }}
+  selector:
+    matchLabels:
+      {{- include "tempconverter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "tempconverter.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "tempconverter.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.appImage.repository }}:{{ .Values.appImage.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.appImage.pullPolicy }}
+          env:
+          - name: DB_HOST
+            value: {{ include "tempconverter.fullname" . }}-mysql-service
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "tempconverter.fullname" . }}-mysql-secret
+                key: mysql-database
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "tempconverter.fullname" . }}-mysql-secret
+                key: mysql-user
+          - name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "tempconverter.fullname" . }}-mysql-secret
+                key: mysql-password
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

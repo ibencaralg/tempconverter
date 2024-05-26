@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: tempconverter-mysql
+  name: {{ include "tempconverter.fullname" . }}-mysql
   labels:
-    app: mysql
+    {{- include "tempconverter.labels" . | nindent 4 }}
 spec:
-  serviceName: tempconverter-mysql-service
+  serviceName: {{ include "tempconverter.fullname" . }}-mysql-service
   replicas: 1
   selector:
     matchLabels:

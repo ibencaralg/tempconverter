@@ -9,7 +9,7 @@ file_env() {
 	local fileVar="${var}_FILE"
 	local def="${2:-}"
 	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
-		mysql_error "Both $var and $fileVar are set (but are exclusive)"
+		file_env_error "Both $var and $fileVar are set (but are exclusive)"
 	fi
 	local val="$def"
 	if [ "${!var:-}" ]; then
@@ -19,6 +19,11 @@ file_env() {
 	fi
 	export "$var"="$val"
 	unset "$fileVar"
+}
+
+file_env_error() {
+	echo ERROR "$@" >&2
+	exit 1
 }
 
 docker_setup_env() {

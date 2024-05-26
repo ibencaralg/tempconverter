@@ -10,6 +10,8 @@ compose.yml
 docker-compose.yml
 docker-stack.yml
 Dockerfile
+# Kubernetes
+k8s
 # Python
 __pycache__
 

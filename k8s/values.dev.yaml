@@ -8,7 +8,7 @@ appImage:
   repository: ibencar022/tempconverter
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "dev"
 
 mysqlImage:
   repository: mysql

@@ -6,7 +6,7 @@ LABEL maintainer="Ben Vicar Cain"
 LABEL version="1.0"
 LABEL description="Tempconverter app for DevOps class"
 
-# Update system packages
+# Update and install system packages
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     curl \
     && apt-get clean \
@@ -27,9 +27,12 @@ COPY . /app/
 # Expose Flask port
 EXPOSE 5000
 
+# Copy docker-entrypoint.sh that will handle Swarm secrets
 COPY docker-entrypoint.sh /
 
+# Set the entrypoint to docker-entrypoint.sh that will start Gunicorn
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Run the Flask app via Gunicorn
+# Only needed if user will override ENTRYPOINT
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
